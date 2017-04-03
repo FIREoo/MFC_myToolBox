@@ -30,6 +30,7 @@ public:
 	//OpenCV
 	static CvSize defaultSize;
 	void ShowImage(IplImage * Image, CWnd * pWnd, CvSize oSize = defaultSize);
+	void ShowImage(cv::Mat Image, CWnd * pWnd, CvSize oSize);
 	void lzShowCam(int index, CWnd * pWnd, CvSize oSize = defaultSize, bool loop = 0);
 	void lzShowCam(int index, CWnd * pWnd, bool loop);
 

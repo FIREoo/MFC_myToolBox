@@ -55,11 +55,14 @@ void CMFC_toolboxDlg::OnBnClickedButton1()
 {
 	MyToolBox TB;
 	IplImage* img_load = nullptr;
-	img_load = cvLoadImage("C:\\fire.jpg",0);
-	//TB.ShowImage(img_load,GetDlgItem(IDC_IMAGE_show),cvSize( img_load->width, img_load->height));
+	cv::Mat img_loadMat;
+	img_loadMat = cvLoadImage("C:\\FIRE.jpg",0);
+
+	while(1)
+	TB.ShowImage(img_loadMat,GetDlgItem(IDC_IMAGE_show),cvSize(img_loadMat.cols, img_loadMat.rows));
 	//TB.ShowImage(img_load, GetDlgItem(IDC_IMAGE_show));
 
-	TB.lzShowCam(0,GetDlgItem(IDC_IMAGE_show), cvSize(640, 480));
+	//TB.lzShowCam(0,GetDlgItem(IDC_IMAGE_show), cvSize(640, 480));
 
 	char a[20] = {"abcdefghijklmnopqrs"};
 	TB.toCString(a);

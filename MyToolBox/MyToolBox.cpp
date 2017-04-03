@@ -17,6 +17,8 @@ MyToolBox::~MyToolBox()
 {
 }
 
+
+//Format
 int MyToolBox::toInt(CString str)
 {
 	return _ttoi(str);
@@ -26,7 +28,6 @@ int MyToolBox::toFloat(CString str)
 {
 	return _ttof(str);
 }
-
 
 CString MyToolBox::toCString(int num)
 {
@@ -40,6 +41,7 @@ CString MyToolBox::toCString(char * chr, int size)
 	tmp = chr;
 	return tmp;
 }
+
 void MyToolBox::CStringToChar(CString str, char* chr, int size)
 {
 	ASSERT(size+1 >= str.GetLength());//char array need to be larger than CString(mind the "/0")
@@ -53,7 +55,7 @@ void MyToolBox::CStringToChar(CString str, char* chr, int size)
 	*/
 }
 
-
+//opencv show
 int Bpp(IplImage* image) { return image ? (image->depth & 255)*image->nChannels : 0; }
 void  FillBitmapInfo(BITMAPINFO* bmi, int width, int height, int bpp, int origin)
 {
@@ -130,6 +132,60 @@ void MyToolBox::ShowImage(IplImage * Image, CWnd * pWnd, CvSize oSize)
 	pWnd->ReleaseDC(dc);
 	//release check
 }
+void MyToolBox::ShowImage(cv::Mat ImageMat, CWnd * pWnd, CvSize oSize)
+{
+	IplImage* Image = nullptr;
+	Image = cvCloneImage(&(IplImage)ImageMat);
+
+	CDC	*dc = pWnd->GetWindowDC();
+	IplImage *img_print = NULL;
+	ASSERT(Image != NULL);//Image can't be NULL
+
+	if (Image->nChannels == 1 || Image->nChannels == 3)
+	{
+		img_print = cvCreateImage(oSize, IPL_DEPTH_8U, Image->nChannels);
+		cvResize(Image, img_print, CV_INTER_LINEAR);
+	}
+	else if (Image->nChannels == 4)
+	{
+		ASSERT(0);//not now
+				  //convret to CH3
+	}
+	else
+	{
+		ASSERT(0);//Channels???
+	}
+
+	ASSERT(img_print != NULL);
+
+	int x = 0; int y = 0;//offset shown picture
+	int from_x = 0; int from_y = 0;//ROI left top corner
+
+	if (img_print->depth == IPL_DEPTH_8U)
+	{
+		uchar buffer[sizeof(BITMAPINFOHEADER) + 1024];
+		BITMAPINFO* bmi = (BITMAPINFO*)buffer;
+		int bmp_w = img_print->width, bmp_h = img_print->height;
+		FillBitmapInfo(bmi, bmp_w, bmp_h, Bpp(img_print), img_print->origin);
+		from_x = MIN(MAX(from_x, 0), bmp_w - 1);
+		from_y = MIN(MAX(from_y, 0), bmp_h - 1);
+		int sw = MAX(MIN(bmp_w - from_x, img_print->width), 0);
+		int sh = MAX(MIN(bmp_h - from_y, img_print->height), 0);
+		SetDIBitsToDevice(
+			*dc, x, y, sw, sh, from_x, from_y, from_y, sh,
+			img_print->imageData + from_y*img_print->widthStep,
+			bmi, DIB_RGB_COLORS);
+	}
+	else
+	{
+		ASSERT(0);//Depth???
+	}
+
+	cvReleaseImage(&img_print);
+	cvReleaseImage(&Image);
+	pWnd->ReleaseDC(dc);
+	//release check
+}
 
 void MyToolBox::lzShowCam(int index, CWnd * pWnd, CvSize oSize, bool loop)
 {
@@ -158,6 +214,7 @@ void MyToolBox::lzShowCam(int index, CWnd * pWnd, bool loop)
 	}
 }
 
+//socket
 void MyToolBox::lzSocketSend(CString strIP, int nPort, CString msg)
 {
 	AfxSocketInit();
@@ -179,7 +236,6 @@ void MyToolBox::lzSocketSend(CString strIP, int nPort, CString msg)
 	delete[] cMsg;
 	aSocket.Close();
 }
-
 void MyToolBox::lzSocketSend(CString strIP, int nPort, char * cMsg, int size)
 {
 	AfxSocketInit();
